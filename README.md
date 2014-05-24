@@ -7,8 +7,11 @@ and more complex Haskell web-applications, and applications in general.
 
 ## Installation
 
-`git clone http://github.com/Crockeo/shurl.git`
-`cd shurl`
-`cabal update`
-`cabal install --only-dependencies`
-`cabal run`
+**Run the following commands in the order specified:**
+```
+git clone http://github.com/Crockeo/shurl.git
+cd shurl
+cabal update
+cabal install --only-dependencies
+cabal run
+```
