@@ -24,4 +24,5 @@ errorRoute =
 main :: IO ()
 main = scotty 80 $ do
   indexRoute
+  informationRoute
   errorRoute
