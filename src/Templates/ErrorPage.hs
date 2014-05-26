@@ -21,7 +21,7 @@ data ErrorPage = ErrorPage
 
 instance Template ErrorPage where
   makeHtml _ =
-    makeHtml $ Header "index" $ do
+    makeHtml $ Header "errorpage" $ do
       h1 ! class_ "text-center" $ do
         "Error: 404"
         br
