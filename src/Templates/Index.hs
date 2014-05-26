@@ -21,4 +21,5 @@ data Index = Index
 
 instance Template Index where
   makeHtml _ =
-    makeHtml $ Header "index" area
+    makeHtml $ Header "index" $ do
+      h1 "Nothing here yet!"
