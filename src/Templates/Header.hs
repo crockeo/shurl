@@ -33,7 +33,7 @@ _head name =
 -- The header row
 _toprow :: Html
 _toprow =
-  div <! "row toprow" $ do
+  div ! class_ "row toprow" $ do
     h1 $ a "shurl"       ! href "/"            ! class_ "col-md-2 col-md-offset-1"
     h1 $ a "information" ! href "/information" ! class_ "col-md-2"
 
@@ -41,7 +41,7 @@ _toprow =
 _body :: Html -> Html
 _body html =
   body $ do
-    div <! "container-fluid" $ do
+    div ! class_ "container-fluid" $ do
       _toprow
       html
 
