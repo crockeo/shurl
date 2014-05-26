@@ -34,8 +34,8 @@ _head name =
 _toprow :: Html
 _toprow =
   div ! class_ "row toprow" $ do
-    h1 $ a "shurl"       ! href "/"            ! class_ "col-md-2 col-md-offset-1"
-    h1 $ a "information" ! href "/information" ! class_ "col-md-2"
+    h1 $ a ! href "/"            ! class_ "col-md-2 col-md-offset-1" $ "shurl"
+    h1 $ a ! href "/information" ! class_ "col-md-2"                 $ "information"
 
 -- The body section
 _body :: Html -> Html
