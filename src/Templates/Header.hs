@@ -19,11 +19,6 @@ import Templates.Template
 -- Code --
 data Header = Header Text Html
 
--- Creating a classed div
-_cdiv :: AttributeValue -> Html -> Html
-_cdiv c html =
-  div html ! class_ c
-
 -- The head section
 _head :: Text -> Html
 _head name =
@@ -38,7 +33,7 @@ _head name =
 -- The header row
 _toprow :: Html
 _toprow =
-  _cdiv "row toprow" $ do
+  div <! "row toprow" $ do
     h1 $ a "shurl"       ! href "/"            ! class_ "col-md-2 col-md-offset-1"
     h1 $ a "information" ! href "/information" ! class_ "col-md-2"
 
@@ -46,7 +41,7 @@ _toprow =
 _body :: Html -> Html
 _body html =
   body $ do
-    _cdiv "container-fluid" $ do
+    div <! "container-fluid" $ do
       _toprow
       html
 
