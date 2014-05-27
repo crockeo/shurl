@@ -19,6 +19,7 @@ executable shurl
   main-is: Main.hs
 
   build-depends: base == 4.6.*
+               , wai-middleware-static
                , blaze-builder
                , blaze-markup
                , blaze-html

@@ -2,12 +2,17 @@
 
 module Main where
 
+import Network.Wai.Middleware.Static
 import Web.Scotty
 
 import Templates.Template
 import Templates.Index
 import Templates.Information
 import Templates.ErrorPage
+
+staticRoute :: ScottyM ()
+staticRoute =
+  middleware $ staticPolicy (noDots >-> addBase "static")
 
 indexRoute :: ScottyM ()
 indexRoute =
@@ -23,6 +28,7 @@ errorRoute =
 
 main :: IO ()
 main = scotty 80 $ do
+  staticRoute
   indexRoute
   informationRoute
   errorRoute
