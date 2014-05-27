@@ -26,5 +26,6 @@ executable shurl
                , directory
                , scotty
                , text
+               , cgi
 
   default-language: Haskell2010
