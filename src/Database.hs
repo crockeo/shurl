@@ -60,21 +60,22 @@ cacheDB = database >>= readIORef >>= cache databaseLocation
 -------------------------
 -- Database Operations --
 
--- Getting a pair from the database
-getURL :: Text -> IO (Maybe Text)
-getURL t = do
-  db <- database >>= readIORef
+-- Getting a URL from a given key in a database
+getUrl :: Text -> Database -> Maybe Text
+getUrl t []          = Nothing
+getUrl t ((k, v):xs) =
+  if k == t
+    then Just v
+    else getUrl t xs
 
-  return $ getURLRaw db t
-  where getURLRaw :: Database -> Text -> Maybe Text
-        getURLRaw []          t = Nothing
-        getURLRaw ((k, v):xs) t =
-          if k == t
-            then Just v
-            else getURLRaw xs t
+-- Putting a (key, URL) pair into a database
+putUrl :: (Text, Text) -> Database -> Database
+putUrl p db = p : db
+
+-- Getting a pair from the database
+getUrlIO :: Text -> IO (Maybe Text)
+getUrlIO t = (database >>= readIORef) >>= return . getUrl t
 
 -- Putting a pair into the database
-putURL :: (Text, Text) -> IO ()
-putURL p = do
-  db <- database
-  modifyIORef db (p :)
+putUrlIO :: (Text, Text) -> IO ()
+putUrlIO p = database >>= (\x -> modifyIORef x $ putUrl p)

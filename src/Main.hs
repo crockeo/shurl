@@ -36,7 +36,7 @@ newPageRoute =
 redirectRoute :: ScottyM ()
 redirectRoute =
   get "/r/:key" $ do
-    redir <- param "key" >>= liftIO . getURL
+    redir <- param "key" >>= liftIO . getUrlIO
 
     case redir of
       Nothing   -> render ErrorPage
