@@ -23,6 +23,7 @@ executable shurl
                , blaze-builder
                , blaze-markup
                , blaze-html
+               , directory
                , scotty
                , text
 

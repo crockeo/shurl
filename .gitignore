@@ -1,3 +1,6 @@
+# Generated project files
+*.db
+
 # Cabal sandbox files
 .cabal-sandbox/
 cabal.sandbox.config
