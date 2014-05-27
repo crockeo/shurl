@@ -39,8 +39,8 @@ cache fp db =
   writeFile fp $ showDatabase db
   where showDatabase :: Database -> String
         showDatabase []          = ""
-        showDatabase ((k, v):[]) = unpack k ++ "," ++ unpack v
-        showDatabase ((k, v):xs) = unpack k ++ "," ++ unpack v ++ "\n" ++ showDatabase xs
+        showDatabase ((k, v):[]) = unpack k ++ " " ++ unpack v
+        showDatabase ((k, v):xs) = unpack k ++ " " ++ unpack v ++ "\n" ++ showDatabase xs
 
 -----------------------
 -- Database Instance --
