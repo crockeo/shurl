@@ -32,9 +32,10 @@ instance Template Information where
 
       div ! class_ "row" $ do
         h3 ! class_ "col-md-2 col-md-offset-2 text-right" $ "Description:"
-        p ! class_ "col-md-6" $ toHtml $ "shurl is a learning-project written by Cerek "         `append`
-                                         "'Crockeo' Hillen to learn how to use Scotty and "      `append`
-                                         "Blaze-Html to make web applications.\n\nIt is a "      `append`
-                                         "fully functional url-shortener. That is, you input a " `append`
-                                         "longer URL, and shurl gives you a shorter URL that "   `append`
-                                         "will redirect you to the original URL."
+        p ! class_ "col-md-6" $ toHtml $
+          "shurl is a learning-project written by Cerek "         `append`
+          "'Crockeo' Hillen to learn how to use Scotty and "      `append`
+          "Blaze-Html to make web applications.\n\nIt is a "      `append`
+          "fully functional url-shortener. That is, you input a " `append`
+          "longer URL, and shurl gives you a shorter URL that "   `append`
+          "will redirect you to the original URL."
