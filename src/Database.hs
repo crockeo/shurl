@@ -4,7 +4,7 @@ module Database where
 
 import System.Directory
 
-import Data.Text.Lazy (Text, unpack, pack)
+import Data.Text.Lazy (Text, append, unpack, pack)
 import Data.IORef
 
 import Control.Monad
@@ -72,10 +72,25 @@ getUrl t ((k, v):xs) =
 putUrl :: (Text, Text) -> Database -> Database
 putUrl p db = p : db
 
+-- Getting the next key from a given database
+nextKey :: Database -> Text
+nextKey []         = "a"
+nextKey ((k, v):_) = k `append` "a"
+
 -- Getting a pair from the database
 getUrlIO :: Text -> IO (Maybe Text)
-getUrlIO t = (database >>= readIORef) >>= return . getUrl t
+getUrlIO t =
+  liftM (getUrl t) $ database >>= readIORef
 
 -- Putting a pair into the database
 putUrlIO :: (Text, Text) -> IO ()
-putUrlIO p = database >>= (\x -> modifyIORef x $ putUrl p)
+putUrlIO p = do
+  db <- database
+  rdb <- readIORef db
+
+  atomicWriteIORef db $ putUrl p rdb
+
+-- Getting the next key for the database
+nextKeyIO :: IO Text
+nextKeyIO =
+  liftM (nextKey) $ database >>= readIORef
