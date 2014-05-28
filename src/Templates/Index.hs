@@ -4,9 +4,9 @@ module Templates.Index where
 
 -------------
 -- Imports --
-import Text.Blaze.Html.Renderer.Text
-import Text.Blaze.Html5.Attributes
-import Text.Blaze.Html5
+import Text.Blaze.Html.Renderer.Text as R
+import Text.Blaze.Html5.Attributes as A
+import Text.Blaze.Html5 as T
 
 import Data.Text.Lazy hiding (head)
 
@@ -21,5 +21,13 @@ data Index = Index
 
 instance Template Index where
   makeHtml _ =
-    makeHtml $ Header "index" $ do
-      h1 "Nothing here yet!"
+    makeHtml $ Header "index" $
+      div ! class_ "container" $ do
+        h1 ! class_ "col-md-offset-1" $ strong "New URL:"
+        
+        T.form ! class_ "form-inline col-md-offset-2" $ do
+          div ! class_ "form-group col-md-3" $
+            input ! type_ "text"   ! name "url" ! placeholder "Enter URL" ! class_ "form-control"
+
+          div ! class_ "form-group" $
+            input ! type_ "submit"                                        ! class_ "btn btn-default"

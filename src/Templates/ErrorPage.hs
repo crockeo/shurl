@@ -4,9 +4,9 @@ module Templates.ErrorPage where
 
 -------------
 -- Imports --
-import Text.Blaze.Html.Renderer.Text
-import Text.Blaze.Html5.Attributes
-import Text.Blaze.Html5
+import Text.Blaze.Html.Renderer.Text as R
+import Text.Blaze.Html5.Attributes as A
+import Text.Blaze.Html5 as T
 
 import Data.Text.Lazy hiding (head)
 

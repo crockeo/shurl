@@ -4,9 +4,9 @@ module Templates.Header where
 
 -------------
 -- Imports --
-import Text.Blaze.Html.Renderer.Text
-import Text.Blaze.Html5.Attributes
-import Text.Blaze.Html5
+import Text.Blaze.Html.Renderer.Text as R
+import Text.Blaze.Html5.Attributes as A
+import Text.Blaze.Html5 as T
 
 import Data.Text.Lazy hiding (head)
 import Data.String hiding (append)
@@ -23,8 +23,8 @@ data Header = Header Text Html
 _head :: Text -> Html
 _head name =
   head $ do
-   link ! rel "stylesheet" ! href "http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"
-   link ! rel "stylesheet" ! href "http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"
+   link ! rel "stylesheet" ! href "/css/bootstrap.min.css"
+   link ! rel "stylesheet" ! href "/css/bootstrap-theme.min.css"
 
    script "" ! type_ "application/javascript" ! (src  $ fromString $ unpack ("/js/"  `append` name `append` ".js" ))
    link      ! rel   "stylesheet"             ! (href $ fromString $ unpack ("/css/" `append` name `append` ".css"))
