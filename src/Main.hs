@@ -30,8 +30,8 @@ indexRoute =
     if url == ""
       then render Index
       else do
-        key <- liftIO nextKeyIO
-        liftIO $ putUrlIO (key, url)
+        key <- liftIO nextKey
+        liftIO $ putUrl (key, url)
 
         redirect $ "/np/" `append` key
 
@@ -47,7 +47,7 @@ newPageRoute =
 redirectRoute :: ScottyM ()
 redirectRoute =
   get "/r/:key" $ do
-    redir <- param "key" >>= liftIO . getUrlIO
+    redir <- param "key" >>= liftIO . getUrl
 
     case redir of
       Nothing   -> render ErrorPage

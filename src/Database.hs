@@ -2,99 +2,38 @@
 
 module Database where
 
-import System.Directory
-
-import Data.Text.Lazy (Text, append, unpack, pack)
-import Data.IORef
+import Database.HDBC.MySql
+import Database.HDBC
 
 import Control.Monad
 
-type Database = [(Text, Text)]
+import Data.Text.Lazy (Text, unpack, pack)
 
-------------------------------------
--- Database Loading / Information --
+-- The database connection
+dbConnection :: IO Connection
+dbConnection =
+  connectMySQL defaultMySQLConnectInfo {
+    mysqlHost     = "127.0.0.1",
+    mysqlUser     = "root",
+    mysqlPassword = "sqlserver"
+  }
 
--- Parsing a database from a string
-parseDatabase :: String -> Database
-parseDatabase string =
-  map makePair $ lines string
-  where makePair :: String -> (Text, Text)
-        makePair s =
-          (pack sh, pack lo)
-          where (sh:lo:[]) = words s
+-- Getting a url from a shurl
+getUrl :: Text -> IO (Maybe Text)
+getUrl shurl = do
+  db <- dbConnection
+  res <- quickQuery db $ "SELECT * FROM redirects WHERE shurl=" ++ show shurl
 
--- Loading a database from a file
-load :: FilePath -> IO Database
-load fp = do
-  fe <- doesFileExist fp
+  case res of
+                []  -> return $ Nothing
+    ((_:url:[]):[]) -> return $ Just $ pack url
 
-  liftM (parseDatabase) $
-    if fe
-      then readFile fp
-      else return ""
+-- Inserting a (shurl, url) pair into the database
+putUrl :: (Text, Text) -> IO ()
+putUrl (shurl, url) = do
+  db <- dbConnection
+  runRaw db "INSERT INTO redirects values(" ++ show shurl ++ ", " ++ show url ++ ")"
 
--- Caching a database
-cache :: FilePath -> Database -> IO ()
-cache fp db =
-  writeFile fp $ showDatabase db
-  where showDatabase :: Database -> String
-        showDatabase []          = ""
-        showDatabase ((k, v):[]) = unpack k ++ " " ++ unpack v
-        showDatabase ((k, v):xs) = unpack k ++ " " ++ unpack v ++ "\n" ++ showDatabase xs
-
------------------------
--- Database Instance --
-
--- The database file name
-databaseLocation :: String
-databaseLocation = "database.db"
-
--- The instance itself
-database :: IO (IORef Database)
-database = load databaseLocation >>= newIORef
-
--- Caching the database instance
-cacheDB :: IO ()
-cacheDB = database >>= readIORef >>= cache databaseLocation
-
--------------------------
--- Database Operations --
-
--- Getting a URL from a given key in a database
-getUrl :: Text -> Database -> Maybe Text
-getUrl t []          = Nothing
-getUrl t ((k, v):xs) =
-  if k == t
-    then Just v
-    else getUrl t xs
-
--- Putting a (key, URL) pair into a database
-putUrl :: (Text, Text) -> Database -> Database
-putUrl p db = p : db
-
--- Getting the next key from a given database
-nextKey :: Database -> Text
-nextKey []         = "a"
-nextKey ((k, v):_) = k `append` "a"
-
--- Getting a pair from the database
-getUrlIO :: Text -> IO (Maybe Text)
-getUrlIO t =
-  liftM (getUrl t) $ database >>= readIORef
-
---
--- ERROR PUSHING NEW DATA INTO THE DATABASE
---
-
--- Putting a pair into the database
-putUrlIO :: (Text, Text) -> IO ()
-putUrlIO p = do
-  db <- database
-  rdb <- readIORef db
-
-  atomicWriteIORef db $ putUrl p rdb
-
--- Getting the next key for the database
-nextKeyIO :: IO Text
-nextKeyIO =
-  liftM (nextKey) $ database >>= readIORef
+-- Generating the next key
+nextKey :: IO Text
+nextKey = "c"
