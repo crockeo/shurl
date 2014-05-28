@@ -6,6 +6,8 @@ import Network.Wai.Middleware.Static
 import Network.CGI (liftIO)
 import Web.Scotty
 
+import Data.Text.Lazy
+
 import Templates.Template
 import Templates.Index
 import Templates.NewPage
@@ -22,10 +24,19 @@ staticRoute =
 -- Serving the index page
 indexRoute :: ScottyM ()
 indexRoute =
-  get "/" $ render Index
+  get "/" $ do
+    url <- (param "url" :: ActionM Text) `rescue` (\x -> return "")
+
+    if url == ""
+      then render Index
+      else do
+        key <- liftIO nextKeyIO
+        liftIO $ putUrlIO (key, url)
+
+        redirect $ "/np/" `append` key
 
 -- Serving the new redirect page
-newPageRoute :: ScottyM ()
+newPageRoute   :: ScottyM ()
 newPageRoute =
   get "/np/:key" $ do
     key <- param "key"
