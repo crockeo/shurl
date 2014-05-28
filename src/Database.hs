@@ -82,6 +82,10 @@ getUrlIO :: Text -> IO (Maybe Text)
 getUrlIO t =
   liftM (getUrl t) $ database >>= readIORef
 
+--
+-- ERROR PUSHING NEW DATA INTO THE DATABASE
+--
+
 -- Putting a pair into the database
 putUrlIO :: (Text, Text) -> IO ()
 putUrlIO p = do
