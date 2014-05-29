@@ -26,9 +26,9 @@ _head name =
    link ! rel "stylesheet" ! href "/css/bootstrap.min.css"
    link ! rel "stylesheet" ! href "/css/bootstrap-theme.min.css"
 
-   script "" ! type_ "application/javascript" ! (src  $ fromString $ unpack ("/js/"  `append` name `append` ".js" ))
-   link      ! rel   "stylesheet"             ! (href $ fromString $ unpack ("/css/" `append` name `append` ".css"))
-   link      ! rel   "stylesheet"             ! (href "/css/main.css"                                              )
+   script "" ! type_ "application/javascript" ! src  (fromString $ unpack ("/js/"  `append` name `append` ".js" ))
+   link      ! rel   "stylesheet"             ! href (fromString $ unpack ("/css/" `append` name `append` ".css"))
+   link      ! rel   "stylesheet"             ! href "/css/main.css"
 
 -- The header row
 _toprow :: Html
@@ -40,7 +40,7 @@ _toprow =
 -- The body section
 _body :: Html -> Html
 _body html =
-  body $ do
+  body $
     div ! class_ "container-fluid" $ do
       _toprow
       html

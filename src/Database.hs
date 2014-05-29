@@ -36,9 +36,9 @@ _nextKey = do
   res <- quickQuery' db "SELECT * FROM redirects" []
   commit db
 
-  if res == []
-    then return "a"
-    else return $ nextKey $ T.pack (fromSql (last res !! 1) :: String)
+  return $ if null res
+    then "a"
+    else nextKey $ T.pack (fromSql (last res !! 1) :: String)
 
 -- Constructing a pair from a row of sql values
 _constructPair :: [SqlValue] -> (T.Text, T.Text)
@@ -51,7 +51,7 @@ _getAll = do
   db <- _dbConnection
   res <- quickQuery' db "SELECT * FROM redirects" []
 
-  return $ map (_constructPair) res
+  return $ map _constructPair res
 
 -- Getting a (shurl, url) pair from the database
 _getPair :: T.Text -> IO (Maybe (T.Text, T.Text))
@@ -60,13 +60,13 @@ _getPair shurl = do
   res <- quickQuery' db ("SELECT * FROM redirects WHERE shurl==" ++ show shurl) []
   commit db
 
-  if res == []
-    then return Nothing
-    else return $ Just $ _constructPair $ head res
+  return $ if null res
+    then Nothing
+    else Just $ _constructPair $ head res
 
 -- Getting a url
 getUrl :: T.Text -> IO (Maybe T.Text)
-getUrl shurl = _getPair shurl >>= return . liftM snd
+getUrl shurl = liftM (liftM snd) $ _getPair shurl
 
 -- Inserting a (shurl, url) pair into the database
 putUrl :: T.Text -> IO T.Text
