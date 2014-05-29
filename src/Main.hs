@@ -30,10 +30,9 @@ indexRoute =
     if url == ""
       then render Index
       else do
-        key <- liftIO nextKey
-        liftIO $ putUrl (key, url)
+        shurl <- liftIO $ putUrl url
 
-        redirect $ "/np/" `append` key
+        redirect $ "/np/" `append` shurl
 
 -- Serving the new redirect page
 newPageRoute   :: ScottyM ()

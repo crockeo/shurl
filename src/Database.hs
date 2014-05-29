@@ -1,52 +1,72 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Database where
+module Database (getUrl, putUrl) where
 
 import Database.HDBC.Sqlite3
 import Database.HDBC
 
 import Control.Monad
 
-import Data.Text.Lazy (Text, unpack, pack)
+import qualified Data.Text.Lazy as T
 import Data.List (sort)
+import Data.Char
+
+import KeyGenerator
 
 -- The database connection
-dbConnection :: IO Connection
-dbConnection = connectSqlite3 "./redirects.db"
+_dbConnection :: IO Connection
+_dbConnection = connectSqlite3 "./redirects.db"
 
--- Converting SqlValues into Strings
-toStrings :: [[SqlValue]] -> [[String]]
-toStrings l =
-  map (map (\x -> fromSql x :: String)) l
-
--- Getting a url from a shurl
-getUrl :: Text -> IO (Maybe Text)
-getUrl shurl = do
-  db <- dbConnection
-  res <- quickQuery' db ("SELECT * FROM redirects WHERE shurl==" ++ show shurl) []
-  commit db
-
-  if res == []
-    then return Nothing
-    else return $ Just $ pack (fromSql $ last $ head res :: String)
-
--- Inserting a (shurl, url) pair into the database
-putUrl :: (Text, Text) -> IO ()
-putUrl (shurl, url) = do
-  db <- dbConnection
-  quickQuery' db ("INSERT INTO redirects values(" ++ show shurl ++ ", " ++ show url ++ ")") []
-  commit db
-
--- Generating the next key
-nextKey :: IO Text
-nextKey = do
-  db <- dbConnection
+-- Getting the next key from the database
+_nextKey :: IO T.Text
+_nextKey = do
+  db <- _dbConnection
   res <- quickQuery' db ("SELECT * FROM redirects") []
   commit db
 
   if res == []
     then return "a"
-    else let fres = last $ sort $ map (head) $ toStrings res in do
-      if last fres == 'z'
-        then return $ pack $ fres ++ "a"
-        else return $ pack $ (init fres) ++ [(succ $ head fres)]
+    else return $ nextKey $ T.pack (fromSql (last res !! 1) :: String)
+
+-- Constructing a pair from a row of sql values
+_constructPair :: [SqlValue] -> (T.Text, T.Text)
+_constructPair (_:shurl:url:[]) =
+  (T.pack (fromSql shurl :: String), T.pack (fromSql url :: String))
+
+-- Getting every (shurl, url) pair
+_getAll :: IO [(T.Text, T.Text)]
+_getAll = do
+  db <- _dbConnection
+  res <- quickQuery' db ("SELECT * FROM redirects") []
+
+  return $ map (_constructPair) res
+
+-- Getting a (shurl, url) pair from the database
+_getPair :: T.Text -> IO (Maybe (T.Text, T.Text))
+_getPair shurl = do
+  db <- _dbConnection
+  res <- quickQuery' db ("SELECT * FROM redirects WHERE shurl==" ++ show shurl) []
+  commit db
+
+  if res == []
+    then return Nothing
+    else return $ Just $ _constructPair $ head res
+
+-- Getting a url
+getUrl :: T.Text -> IO (Maybe T.Text)
+getUrl shurl = _getPair shurl >>= return . liftM snd
+
+-- Inserting a (shurl, url) pair into the database
+putUrl :: T.Text -> IO T.Text
+putUrl url = do
+  db <- _dbConnection
+  shurl <- _nextKey
+  pair <- _getPair shurl
+
+  case pair of
+    Nothing -> do
+      quickQuery' db ("INSERT INTO redirects(shurl, url) values(" ++ show shurl ++ ", " ++ show url ++ ")") []
+      commit db
+      return shurl
+    Just _ ->
+      return shurl
