@@ -22,8 +22,8 @@ executable shurl
                , wai-middleware-static
                , blaze-builder
                , blaze-markup
+               , HDBC-sqlite3
                , blaze-html
-               , HDBC-mysql
                , directory
                , scotty
                , HDBC
