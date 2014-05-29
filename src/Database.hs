@@ -2,26 +2,38 @@
 
 module Database (getUrl, putUrl) where
 
-import Database.HDBC.Sqlite3
-import Database.HDBC
-
-import Control.Monad
-
 import qualified Data.Text.Lazy as T
 import Data.List (sort)
 import Data.Char
+
+import Database.HDBC.Sqlite3
+import Database.HDBC
+
+import System.Directory
+
+import Control.Monad
 
 import KeyGenerator
 
 -- The database connection
 _dbConnection :: IO Connection
-_dbConnection = connectSqlite3 "./redirects.db"
+_dbConnection = do
+  fe <- doesFileExist "./redirects.db"
+  db <- connectSqlite3 "./redirects.db"
+
+  if not fe
+    then do
+      quickQuery' db "CREATE TABLE redirects (rowid INTEGER PRIMARY KEY AUTOINCREMENT, shurl VARCHAR, url VARCHAR)" []
+      commit db
+
+      return db
+    else return db
 
 -- Getting the next key from the database
 _nextKey :: IO T.Text
 _nextKey = do
   db <- _dbConnection
-  res <- quickQuery' db ("SELECT * FROM redirects") []
+  res <- quickQuery' db "SELECT * FROM redirects" []
   commit db
 
   if res == []
@@ -37,7 +49,7 @@ _constructPair (_:shurl:url:[]) =
 _getAll :: IO [(T.Text, T.Text)]
 _getAll = do
   db <- _dbConnection
-  res <- quickQuery' db ("SELECT * FROM redirects") []
+  res <- quickQuery' db "SELECT * FROM redirects" []
 
   return $ map (_constructPair) res
 
